@@ -25,26 +25,38 @@ cd Treningsdagbok
 
 The application uses SQLite to store data. No initial setup is required as SQLite will create the database file when you run the server if it doesn't already exist.
 
-### Starting the Backend Server
+### Starting the React Application
 
-To start the Express server, navigate to the server directory and run:
+Install node in terminal:
 
 ```bash
-npm start // Or `node server.js` if you prefer to run directly
+npm install node
 ```
-
-This will start the backend server on `http://localhost:3001`. Ensure that the server is running properly and that there are no errors in the console.
-
-### Starting the React Application
 
 Open a new terminal and navigate to the client directory:
 
 ```bash
-cd path/to/client
 npm start
 ```
 
 This command runs the app in development mode. Open [http://localhost:3000](http://localhost:3000) to view it in your browser. The page will reload if you make edits. You will also see any lint errors in the console.
+
+
+### Starting the Backend Server
+
+Install express in terminal:
+
+```bash
+npm install express
+```
+
+To start the Express server, navigate to the server directory and run:
+
+```bash
+node server.js
+```
+
+This will start the backend server on `http://localhost:3001`. Ensure that the server is running properly and that there are no errors in the console.
 
 ## Usage
 
