@@ -71,11 +71,25 @@ function App() {
     setNotes([...notes, newNote]);
   };
 
+  const handleEdit = async (note) => {
+    const response = await fetch(`http://localhost:3001/notes/${note.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(note)
+    });
+    if (response.ok) {
+      fetchNotes();  // Refresh notes to show any updates
+    } else {
+      console.error('Error updating note');
+    }
+  };
+
   return (
     <Router>
       <div className="App">
         <Routes>
-          <Route path="/login" element={!loggedIn ? <LoginPage onLoginSuccess={() => setLoggedIn(true)} /> : <Navigate to="/" />} />
           <Route path="/" element={loggedIn ? (
             <div className='board'>
               <h1>Notat Applikasjon</h1>
@@ -83,13 +97,15 @@ function App() {
                 {notes.map(note => (
                   <div key={note.id} className="note">
                     <input type="text" placeholder="Title" defaultValue={note.title} onChange={(e) => note.title = e.target.value} />
-                    <textarea defaultValue={note.content} onBlur={(e) => note.content = e.target.value} />
+                    <textarea defaultValue={note.content} onChange={(e) => note.content = e.target.value} />
                     <input type="text" placeholder="Tags" defaultValue={note.tags} onChange={(e) => note.tags = e.target.value} />
-                    <button onClick={() => handleSave(note)}>Save</button>
+                    <div>Date Added: {note.createdAt}</div>
+                    <div>Last Modified: {note.modifiedAt}</div>
+                    <button onClick={() => handleEdit(note)}>Edit</button>
                     <button onClick={() => handleDelete(note.id)}>Delete</button>
                   </div>
                 ))}
-                <button className="add-note-button" onClick={addNote}>+</button>
+                <button className="add-note-button" onClick={addNote}>Add Note</button>
               </div>
             </div>
           ) : <Navigate to="/login" />} />
