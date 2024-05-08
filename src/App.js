@@ -15,7 +15,7 @@ function App() {
   const fetchNotes = async () => {
     if (!loggedIn) return;
     try {
-      const response = await fetch('http://localhost:3001/notes?userId=1'); // Assuming userId = 1 for example
+      const response = await fetch('http://localhost:3001/notes?userId=1');
       if (response.ok) {
         const fetchedNotes = await response.json();
         setNotes(fetchedNotes);
@@ -38,10 +38,10 @@ function App() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ ...note, userId: 1 }) // Assuming userId = 1 for simplicity
+        body: JSON.stringify({ ...note, userId: 1 })
       });
       if (response.ok) {
-        fetchNotes();  // Refresh notes to show any updates
+        fetchNotes();
       } else {
         throw new Error('Error saving note');
       }
@@ -56,7 +56,7 @@ function App() {
         method: 'DELETE'
       });
       if (response.ok) {
-        fetchNotes();  // Refresh notes after deletion
+        fetchNotes();
       } else {
         const errorResponse = await response.json();
         throw new Error('Error deleting note: ' + errorResponse.error);
@@ -71,25 +71,11 @@ function App() {
     setNotes([...notes, newNote]);
   };
 
-  const handleEdit = async (note) => {
-    const response = await fetch(`http://localhost:3001/notes/${note.id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(note)
-    });
-    if (response.ok) {
-      fetchNotes();  // Refresh notes to show any updates
-    } else {
-      console.error('Error updating note');
-    }
-  };
-
   return (
     <Router>
       <div className="App">
         <Routes>
+          <Route path="/login" element={!loggedIn ? <LoginPage onLoginSuccess={() => setLoggedIn(true)} /> : <Navigate to="/" />} />
           <Route path="/" element={loggedIn ? (
             <div className='board'>
               <h1>Notat Applikasjon</h1>
@@ -97,15 +83,13 @@ function App() {
                 {notes.map(note => (
                   <div key={note.id} className="note">
                     <input type="text" placeholder="Title" defaultValue={note.title} onChange={(e) => note.title = e.target.value} />
-                    <textarea defaultValue={note.content} onChange={(e) => note.content = e.target.value} />
+                    <textarea defaultValue={note.content} onBlur={(e) => note.content = e.target.value} />
                     <input type="text" placeholder="Tags" defaultValue={note.tags} onChange={(e) => note.tags = e.target.value} />
-                    <div>Date Added: {note.createdAt}</div>
-                    <div>Last Modified: {note.modifiedAt}</div>
-                    <button onClick={() => handleEdit(note)}>Edit</button>
+                    <button onClick={() => handleSave(note)}>Save</button>
                     <button onClick={() => handleDelete(note.id)}>Delete</button>
                   </div>
                 ))}
-                <button className="add-note-button" onClick={addNote}>Add Note</button>
+                <button className="add-note-button" onClick={addNote}>+</button>
               </div>
             </div>
           ) : <Navigate to="/login" />} />

@@ -67,37 +67,15 @@ app.post('/login', (req, res) => {
   });
 });
 
-// When creating a new note
+// Add a note with userId
 app.post('/notes', (req, res) => {
-  const { userId, title, content, tags } = req.body;
-  const createdAt = new Date().toISOString();
-  const modifiedAt = createdAt;
-  db.run('INSERT INTO notes (userId, title, content, tags, createdAt, modifiedAt) VALUES (?, ?, ?, ?, ?, ?)',
-      [userId, title, content, tags, createdAt, modifiedAt], function (err) {
+  const { userId, title, content, tags, createdAt, modifiedAt } = req.body;
+  db.run('INSERT INTO notes (userId, title, content, tags, createdAt, modifiedAt) VALUES (?, ?, ?, ?, ?, ?)', [userId, title, content, tags, createdAt, modifiedAt], function (err) {
       if (err) {
           res.status(500).json({ error: err.message });
           return;
       }
       res.json({ id: this.lastID });
-  });
-});
-
-// When updating an existing note
-app.put('/notes/:id', (req, res) => {
-  const { id } = req.params;
-  const { title, content, tags } = req.body;
-  const modifiedAt = new Date().toISOString();
-  db.run('UPDATE notes SET title = ?, content = ?, tags = ?, modifiedAt = ? WHERE id = ?',
-      [title, content, tags, modifiedAt, id], function (err) {
-      if (err) {
-          res.status(500).json({ error: err.message });
-          return;
-      }
-      if (this.changes > 0) {
-          res.json({ message: 'Updated successfully' });
-      } else {
-          res.status(404).json({ error: 'Note not found' });
-      }
   });
 });
 
