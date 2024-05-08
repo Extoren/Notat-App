@@ -1,70 +1,71 @@
-# Getting Started with Create React App
+# Note-Taking Application
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project is a full-stack note-taking application built with React for the frontend and Express.js for the backend, utilizing SQLite for data storage. It features a simple and intuitive interface for managing notes, each with titles, contents, and tags.
 
-## Available Scripts
+## Prerequisites
 
-In the project directory, you can run:
+Before you begin, ensure you have the following installed on your system:
+- Node.js (Download [here](https://nodejs.org/en/))
+- npm (Comes with Node.js installation)
 
-### `npm start`
+## Setting Up
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+To get the project up and running on your local machine, follow these steps:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Clone the Repository
 
-### `npm test`
+First, clone this repository to your local machine using:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```bash
+git clone https://github.com/Extoren/Treningsdagbok.git
+cd Treningsdagbok
+```
 
-### `npm run build`
+### Database Setup
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+The application uses SQLite to store data. No initial setup is required as SQLite will create the database file when you run the server if it doesn't already exist.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Starting the Backend Server
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+To start the Express server, navigate to the server directory and run:
 
-### `npm run eject`
+```bash
+npm start // Or `node server.js` if you prefer to run directly
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+This will start the backend server on `http://localhost:3001`. Ensure that the server is running properly and that there are no errors in the console.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Starting the React Application
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Open a new terminal and navigate to the client directory:
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```bash
+cd path/to/client
+npm start
+```
 
-## Learn More
+This command runs the app in development mode. Open [http://localhost:3000](http://localhost:3000) to view it in your browser. The page will reload if you make edits. You will also see any lint errors in the console.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Usage
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+After starting both the server and client, you can access the application through your web browser at `http://localhost:3000`. 
 
-### Code Splitting
+- **Login/Register**: First, register a new user or log in.
+- **Add Notes**: Click the "+" button down left to create a new note.
+- **Edit Notes**: Click on any note field (title, content, or tags) to edit its information.
+- **Save Notes**: Click the "Save" button to save changes to a note.
+- **Delete Notes**: Click the "Delete" button to remove a note permanently.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Deployment
 
-### Analyzing the Bundle Size
+Refer to the `deployment` section for instructions on how to deploy the application to a live system.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Further Help
 
-### Making a Progressive Web App
+For more information on how to use Create React App, you can find the full documentation [here](https://facebook.github.io/create-react-app/docs/getting-started).
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+For more details on React itself, check the [React documentation](https://reactjs.org/).
 
-### Advanced Configuration
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+I hope you enjoy using this application!

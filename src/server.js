@@ -1,97 +1,116 @@
 const express = require('express');
-const fs = require('fs');
-const cors = require('cors');
 const bodyParser = require('body-parser');
-
+const cors = require('cors');
+const sqlite3 = require('sqlite3').verbose();
 const app = express();
-const PORT = 3001;
-const WORKOUTS_FILE = './data/workouts.json';
+const bcrypt = require('bcryptjs');
 
 app.use(cors());
 app.use(bodyParser.json());
 
-// Ensure the workouts.json file exists
-if (!fs.existsSync(WORKOUTS_FILE)) {
-  fs.writeFileSync(WORKOUTS_FILE, JSON.stringify([]), 'utf8');
-}
-
-// GET endpoint to retrieve workouts
-app.get('/workouts', (req, res) => {
-  fs.readFile(WORKOUTS_FILE, (err, data) => {
-    if (err) {
-      res.status(500).send('Error reading data file.');
-    } else {
-      res.send(data);
-    }
-  });
+// Connect to the database and create tables if they don't exist
+const db = new sqlite3.Database('./database.db', (err) => {
+  if (err) {
+      console.error('Error opening database', err.message);
+  } else {
+      console.log('Database connected!');
+      db.run(`
+          CREATE TABLE IF NOT EXISTS users (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              username TEXT UNIQUE NOT NULL,
+              password TEXT NOT NULL
+          )`, (err) => {
+              if (err) console.error("Error creating users table", err.message);
+          });
+      db.run(`
+          CREATE TABLE IF NOT EXISTS notes (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              userId INTEGER,
+              title TEXT,
+              content TEXT,
+              tags TEXT,
+              createdAt TEXT,
+              modifiedAt TEXT,
+              FOREIGN KEY (userId) REFERENCES users(id)
+          )`, (err) => {
+              if (err) console.error("Error creating notes table", err.message);
+          });
+  }
 });
 
-// POST endpoint to add a new workout
-app.post('/workouts', (req, res) => {
-  const newWorkout = req.body;
-  fs.readFile(WORKOUTS_FILE, (err, data) => {
-    if (err) {
-      res.status(500).send('Error reading data file.');
-    } else {
-      const workouts = JSON.parse(data);
-      workouts.push({...newWorkout, id: Date.now()});  // Adding a unique ID based on timestamp
-      fs.writeFile(WORKOUTS_FILE, JSON.stringify(workouts, null, 2), (err) => {
-        if (err) {
-          res.status(500).send('Error writing data file.');
-        } else {
-          res.status(201).send('Workout added successfully.');
-        }
-      });
-    }
-  });
-});
-
-// DELETE endpoint to remove a workout
-app.delete('/workouts/:id', (req, res) => {
-    const { id } = req.params;
-    fs.readFile(WORKOUTS_FILE, (err, data) => {
+// Register a new user
+app.post('/register', async (req, res) => {
+  const { username, password } = req.body;
+  const hashedPassword = await bcrypt.hash(password, 8);
+  db.run('INSERT INTO users (username, password) VALUES (?, ?)', [username, hashedPassword], function (err) {
       if (err) {
-        res.status(500).send('Error reading data file.');
-      } else {
-        let workouts = JSON.parse(data);
-        workouts = workouts.filter(workout => workout.id !== parseInt(id));
-        fs.writeFile(WORKOUTS_FILE, JSON.stringify(workouts, null, 2), err => {
-          if (err) {
-            res.status(500).send('Error writing data file.');
-          } else {
-            res.send('Workout deleted successfully.');
-          }
-        });
+          res.status(500).json({ error: err.message });
+          return;
       }
-    });
-  });  
+      res.json({ id: this.lastID, username });
+  });
+});
 
-// PATCH endpoint to update a workout
-app.patch('/workouts/:id', (req, res) => {
-  const { id } = req.params;
-  const updateData = req.body;
-  fs.readFile(WORKOUTS_FILE, (err, data) => {
-    if (err) {
-      res.status(500).send('Error reading data file.');
-    } else {
-      let workouts = JSON.parse(data);
-      const index = workouts.findIndex(workout => workout.id === parseInt(id));
-      if (index !== -1) {
-        workouts[index] = { ...workouts[index], ...updateData };
-        fs.writeFile(WORKOUTS_FILE, JSON.stringify(workouts, null, 2), err => {
-          if (err) {
-            res.status(500).send('Error writing data file.');
-          } else {
-            res.send('Workout updated successfully.');
-          }
-        });
-      } else {
-        res.status(404).send('Workout not found.');
+// User login
+app.post('/login', (req, res) => {
+  const { username, password } = req.body;
+  db.get('SELECT * FROM users WHERE username = ?', [username], (err, user) => {
+      if (err) {
+          res.status(500).json({ error: err.message });
+          return;
       }
+      if (user && bcrypt.compareSync(password, user.password)) {
+          res.json({ message: "Login successful", userId: user.id });
+      } else {
+          res.status(400).json({ error: "Invalid credentials" });
+      }
+  });
+});
+
+// Add a note with userId
+app.post('/notes', (req, res) => {
+  const { userId, title, content, tags, createdAt, modifiedAt } = req.body;
+  db.run('INSERT INTO notes (userId, title, content, tags, createdAt, modifiedAt) VALUES (?, ?, ?, ?, ?, ?)', [userId, title, content, tags, createdAt, modifiedAt], function (err) {
+      if (err) {
+          res.status(500).json({ error: err.message });
+          return;
+      }
+      res.json({ id: this.lastID });
+  });
+});
+
+// Get all notes for a specific user
+app.get('/notes', (req, res) => {
+  const { userId } = req.query; 
+  db.all('SELECT * FROM notes WHERE userId = ?', [userId], (err, rows) => {
+      if (err) {
+          res.status(500).json({ error: err.message });
+          return;
+      }
+      res.json(rows);
+  });
+});
+
+// Delete a note
+app.delete('/notes/:id', (req, res) => {
+  const { id } = req.params;
+  db.run('DELETE FROM notes WHERE id = ?', id, function (err) {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    if (this.changes > 0) {
+      res.json({ message: 'Deleted successfully' });
+    } else {
+      res.status(404).json({ error: 'Note not found' });
     }
   });
 });
 
+
+
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
+

@@ -1,84 +1,101 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import LoginPage from './components/LoginPage';
 
 function App() {
-  const [workouts, setWorkouts] = useState([]);
-  const [editing, setEditing] = useState(null);
-  const [formData, setFormData] = useState({date: '', duration: '', notes: ''});
+  const [notes, setNotes] = useState([]);
+  const [loggedIn, setLoggedIn] = useState(false);
 
   useEffect(() => {
-    fetch('/workouts')
-      .then(response => response.json())
-      .then(data => setWorkouts(data))
-      .catch(error => console.error('Error fetching workouts:', error));
+    const isAuthed = localStorage.getItem('isLoggedIn') === 'true';
+    setLoggedIn(isAuthed);
   }, []);
 
-  const handleFormChange = (event) => {
-    const { name, value } = event.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+  const fetchNotes = async () => {
+    if (!loggedIn) return;
+    try {
+      const response = await fetch('http://localhost:3001/notes?userId=1'); // Assuming userId = 1 for example
+      if (response.ok) {
+        const fetchedNotes = await response.json();
+        setNotes(fetchedNotes);
+      } else {
+        throw new Error('Error fetching notes');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const method = editing ? 'PATCH' : 'POST';
-    const url = editing ? `/workouts/${editing.id}` : '/workouts';
-    fetch(url, {
-      method: method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData),
-    })
-    .then(response => response.json())
-    .then(() => {
-      fetch('/workouts').then(response => response.json()).then(data => setWorkouts(data));
-      setEditing(null);
-      setFormData({date: '', duration: '', notes: ''});
-    })
-    .catch(error => console.error('Error saving workout:', error));
+  useEffect(() => {
+    fetchNotes();
+  }, [loggedIn]);
+
+  const handleSave = async (note) => {
+    try {
+      const response = await fetch('http://localhost:3001/notes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ...note, userId: 1 }) // Assuming userId = 1 for simplicity
+      });
+      if (response.ok) {
+        fetchNotes();  // Refresh notes to show any updates
+      } else {
+        throw new Error('Error saving note');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
-  const startEditing = (workout) => {
-    setEditing(workout);
-    setFormData(workout);
+  const handleDelete = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:3001/notes/${id}`, {
+        method: 'DELETE'
+      });
+      if (response.ok) {
+        fetchNotes();  // Refresh notes after deletion
+      } else {
+        const errorResponse = await response.json();
+        throw new Error('Error deleting note: ' + errorResponse.error);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
 
-  const cancelEditing = () => {
-    setEditing(null);
-    setFormData({date: '', duration: '', notes: ''});
-  };
-
-  const handleDelete = (id) => {
-    fetch(`/workouts/${id}`, {
-      method: 'DELETE',
-    })
-    .then(response => response.json())
-    .then(() => {
-      fetch('/workouts').then(response => response.json()).then(data => setWorkouts(data));
-    })
-    .catch(error => console.error('Error deleting workout:', error));
+  const addNote = () => {
+    const newNote = { id: notes.length + 1, title: '', content: '', tags: '', userId: 1 };
+    setNotes([...notes, newNote]);
   };
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <h1>Workouts</h1>
-        <form onSubmit={handleSubmit}>
-          <input type="date" name="date" value={formData.date} onChange={handleFormChange} required />
-          <input type="number" name="duration" value={formData.duration} onChange={handleFormChange} required placeholder="Duration in minutes" />
-          <input type="text" name="notes" value={formData.notes} onChange={handleFormChange} required placeholder="Notes" />
-          <button type="submit">{editing ? 'Update' : 'Add'} Workout</button>
-          {editing && <button onClick={cancelEditing}>Cancel</button>}
-        </form>
-        <ul>
-          {workouts.map(workout => (
-            <li key={workout.id}>
-              {workout.date} - Duration: {workout.duration} minutes, Notes: {workout.notes}
-              <button onClick={() => startEditing(workout)}>Edit</button>
-              <button onClick={() => handleDelete(workout.id)}>Delete</button>
-            </li>
-          ))}
-        </ul>
-      </header>
-    </div>
+    <Router>
+      <div className="App">
+        <Routes>
+          <Route path="/login" element={!loggedIn ? <LoginPage onLoginSuccess={() => setLoggedIn(true)} /> : <Navigate to="/" />} />
+          <Route path="/" element={loggedIn ? (
+            <div className='board'>
+              <h1>Notat Applikasjon</h1>
+              <div className="note-board">
+                {notes.map(note => (
+                  <div key={note.id} className="note">
+                    <input type="text" placeholder="Title" defaultValue={note.title} onChange={(e) => note.title = e.target.value} />
+                    <textarea defaultValue={note.content} onBlur={(e) => note.content = e.target.value} />
+                    <input type="text" placeholder="Tags" defaultValue={note.tags} onChange={(e) => note.tags = e.target.value} />
+                    <button onClick={() => handleSave(note)}>Save</button>
+                    <button onClick={() => handleDelete(note.id)}>Delete</button>
+                  </div>
+                ))}
+                <button className="add-note-button" onClick={addNote}>+</button>
+              </div>
+            </div>
+          ) : <Navigate to="/login" />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
