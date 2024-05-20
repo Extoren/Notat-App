@@ -13,6 +13,11 @@ function App() {
     setLoggedIn(isAuthed);
   }, []);
 
+  const signOut = () => {
+    localStorage.removeItem('isLoggedIn'); 
+    setLoggedIn(false);
+  };
+
   const fetchNotes = async (tags = '') => {
     if (!loggedIn) return;
     try {
@@ -153,6 +158,7 @@ function App() {
           <Route path="/" element={loggedIn ? (
             <div className='board'>
               <h1>Notat Applikasjon</h1>
+              <button onClick={signOut}>Sign Out</button>
               <form onSubmit={handleSearch}>
                 <input
                   type="text"
