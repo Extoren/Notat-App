@@ -1,83 +1,59 @@
-# Note-Taking Application
+Notat-App
 
-This project is a full-stack note-taking application built with React for the frontend and Express.js for the backend, utilizing SQLite for data storage. It features a simple and intuitive interface for managing notes, each with titles, contents, and tags.
+Description: Notat-App is a web-based application designed for note-taking, which allows users to manage personal notes with features such as user authentication, CRUD operations on notes, and import/export functionalities.
 
-## Prerequisites
+Installation:
 
-Before you begin, ensure you have the following installed on your system:
-- Node.js (Download [here](https://nodejs.org/en/))
-- npm (Comes with Node.js installation)
+Prerequisites:
 
-## Setting Up
+-   Node.js: Required to run the backend and frontend
+-   npm (Node Package Manager): Used to install dependencies
 
-To get the project up and running on your local machine, follow these steps:
+Check Node.js installation:
 
-### Clone the Repository
+`node --version`
 
-First, clone this repository to your local machine using:
+Check npm installation:
 
-```bash
-git clone https://github.com/Extoren/Treningsdagbok.git
-cd Treningsdagbok
-```
+`npm --version`
 
-### Database Setup
+Dependencies: Install all necessary dependencies by running:
 
-The application uses SQLite to store data. No initial setup is required as SQLite will create the database file when you run the server if it doesn't already exist.
+`npm install`
 
-### Starting the React Application
+This command installs packages like:
 
-Install node in terminal:
+-   express: For the server framework
+-   body-parser: For parsing incoming request bodies
+-   cors: For enabling CORS (Cross-Origin Resource Sharing)
+-   sqlite3: For the SQLite database functionality
+-   bcryptjs: For hashing and comparing passwords
 
-```bash
-npm install node
-```
+Database Setup: The application uses SQLite for storing data. The database is set up automatically when the server runs:
 
-Open a new terminal and navigate to the client directory:
+`// Database setup in server.js
+const sqlite3 = require('sqlite3').verbose();
+const db = new sqlite3.Database('./database.db', ...);`
 
-```bash
-npm start
-```
+Running the Server: Start the server by running:
 
-This command runs the app in development mode. Open [http://localhost:3000](http://localhost:3000) to view it in your browser. The page will reload if you make edits. You will also see any lint errors in the console.
+`node server.js`
 
+The server will listen on port 3001 by default. Adjust the port by modifying the PORT environment variable if necessary.
 
-### Starting the Backend Server
+Running the React Application:
 
-Install express in terminal:
+Navigate to the project directory and start the React application:
 
-```bash
-npm install express
-```
+`npm start`
 
-To start the Express server, navigate to the server directory and run:
+This command runs the app in development mode. Visit [http://localhost:3000](http://localhost:3000/) to view it in your browser. The page will automatically reload if you make edits.
 
-```bash
-node server.js
-```
+Usage:
 
-This will start the backend server on `http://localhost:3001`. Ensure that the server is running properly and that there are no errors in the console.
+Features:
 
-## Usage
-
-After starting both the server and client, you can access the application through your web browser at `http://localhost:3000`. 
-
-- **Login/Register**: First, register a new user or log in.
-- **Add Notes**: Click the "+" button down left to create a new note.
-- **Edit Notes**: Click on any note field (title, content, or tags) to edit its information.
-- **Save Notes**: Click the "Save" button to save changes to a note.
-- **Delete Notes**: Click the "Delete" button to remove a note permanently.
-
-## Deployment
-
-Refer to the `deployment` section for instructions on how to deploy the application to a live system.
-
-## Further Help
-
-For more information on how to use Create React App, you can find the full documentation [here](https://facebook.github.io/create-react-app/docs/getting-started).
-
-For more details on React itself, check the [React documentation](https://reactjs.org/).
-
----
-
-I hope you enjoy using this application!
+-   User Authentication: Users can register, login, and logout.
+-   CRUD Operations: Users can create, read, update, and delete notes.
+-   Search: Users can search for notes by tags.
+-   Import/Export: Users can import and export notes in JSON format.
