@@ -49,6 +49,15 @@ Navigate to the project directory and start the React application:
 
 This command runs the app in development mode. Visit [http://localhost:3000](http://localhost:3000/) to view it in your browser. The page will automatically reload if you make edits.
 
+If this error shows:
+
+`Error: error:0308010C:digital envelope routines::unsupported`
+
+Run:
+```
+$env:NODE_OPTIONS="--openssl-legacy-provider"
+```
+
 Usage:
 
 Features:
