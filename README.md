@@ -1,7 +1,12 @@
-Notat-App
+# Notat-App
 
 Description: Notat-App is a web-based application designed for note-taking, which allows users to manage personal notes with features such as user authentication, CRUD operations on notes, and import/export functionalities.
 
+### Read Testplan [Testplan.docx]
+### Read Report [Rapport.docx]
+
+
+#
 Installation:
 
 Prerequisites:
