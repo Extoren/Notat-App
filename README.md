@@ -1,7 +1,12 @@
-Notat-App
+# Notat-App
 
 Description: Notat-App is a web-based application designed for note-taking, which allows users to manage personal notes with features such as user authentication, CRUD operations on notes, and import/export functionalities.
 
+### Read Testplan [Testplan.docx]
+### Read Report [Rapport.docx]
+
+
+#
 Installation:
 
 Prerequisites:
@@ -48,6 +53,15 @@ Navigate to the project directory and start the React application:
 `npm start`
 
 This command runs the app in development mode. Visit [http://localhost:3000](http://localhost:3000/) to view it in your browser. The page will automatically reload if you make edits.
+
+If this error shows:
+
+`Error: error:0308010C:digital envelope routines::unsupported`
+
+Run:
+```
+$env:NODE_OPTIONS="--openssl-legacy-provider"
+```
 
 Usage:
 
